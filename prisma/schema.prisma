@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id_cliente Int       @id @default(autoincrement())
+  nome       String    @db.VarChar(40)
+  cpf        String    @db.Char(11)
+  telefone   String    @db.Char(9)
+  email      String    @db.VarChar(100)
+  reservas   Reserva[]  // 1:N com Reserva
+
+  @@map("clientes")
+}
+
+model Viagem {
+  id_viagem    Int         @id @default(autoincrement())
+  destino      String      @db.VarChar(30)
+  data_inicio  DateTime    @default(now())
+  data_fim     DateTime
+  preco        Decimal     @db.Decimal(10,2)
+  reservas     Reserva[]   // 1:N com Reserva
+
+  @@map("viagens")
+}
+
+model Reserva {
+  id_reserva    Int         @id @default(autoincrement())
+  data_reserva  DateTime    @default(now())
+  status        String      @db.VarChar(100)
+  id_cliente    Int
+  id_viagem     Int
+  cliente       Cliente     @relation(fields: [id_cliente], references: [id_cliente])
+  viagem        Viagem      @relation(fields: [id_viagem], references: [id_viagem])
+  pagamentos    Pagamento? 
+  usuarioId   Int
+usuario     usuario  @relation(fields: [usuarioId], references: [id_usuario])
+ 
+
+  @@map("reservas")
+}
+
+model Pagamento {
+  id_pagamento     Int         @id @default(autoincrement())
+  valor            Decimal     @db.Decimal(10,2)
+  forma_pagamento  formas
+  data_pagamento   DateTime    @default(now())
+  id_reserva       Int     @unique
+  reserva          Reserva     @relation(fields: [id_reserva], references: [id_reserva])
+  @@map("pagamentos")
+}
+model usuario {
+  id_usuario      Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(40)
+  email           String    @db.VarChar(100) @unique
+  senha           String    @db.VarChar(100)
+  status          String    @default("INATIVO")
+  codigoAtivacao  String?   @db.VarChar(100)
+  tentativas      Int       @default(0)
+  bloqueado       Boolean   @default(false)
+  logs Log[]
+
+
+reservas        Reserva[]
+
+  @@map("usuarios")
+}
+
+model Log {
+  id_log      Int      @id @default(autoincrement())
+  acao        String   @db.VarChar(200)
+  data        DateTime @default(now())
+  usuarioId   Int
+  usuario     usuario  @relation(fields: [usuarioId], references: [id_usuario])
+
+  @@map("logs")
+}
+
+
+
+enum formas {
+  PIX
+  Cartao
+  Dinheiro
+}
