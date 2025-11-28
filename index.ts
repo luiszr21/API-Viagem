@@ -6,6 +6,7 @@ import routesPagamentos from './routes/pagamentos'
 import routesUsuario from './routes/usuario'
 import "./routes/verificaToken";
 import logs from './routes/logs'
+import backup from './routes/backup'
 
 const app = express()
 const port = 3000
@@ -18,6 +19,8 @@ app.use("/reservas", routesReservas)
 app.use("/pagamentos", routesPagamentos)
 app.use("/usuario", routesUsuario)
 app.use("/logs", logs)
+app.use("/", backup);
+
 app.get('/', (req, res) => {
   res.send('API: Controle de Viagens')
 })

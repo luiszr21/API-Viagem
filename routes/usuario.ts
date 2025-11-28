@@ -8,18 +8,14 @@ import nodemailer from "nodemailer";
 const router = Router();
 const prisma = new PrismaClient();
 
-// ===========================
-//  VALIDADOR ZOD
-// ===========================
+
 const usuarioSchema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: z.string().email("E-mail inválido"),
   senha: z.string().min(8, "Senha deve ter no mínimo 8 caracteres")
 });
 
-// ===========================
-//  VALIDAÇÃO DE SENHA FORTE
-// ===========================
+
 function validaSenha(senha: string) {
   const erros: string[] = [];
 
@@ -33,9 +29,7 @@ function validaSenha(senha: string) {
   return erros;
 }
 
-// ===========================
-//  MAILTRAP
-// ===========================
+
 const transporter = nodemailer.createTransport({
   host: "sandbox.smtp.mailtrap.io",
   port: 587,
@@ -45,9 +39,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ===========================
-//  CADASTRAR
-// ===========================
+
 router.post("/cadastrar", async (req, res) => {
   const valida = usuarioSchema.safeParse(req.body);
   if (!valida.success) return res.status(400).json({ erro: valida.error });
@@ -83,9 +75,6 @@ router.post("/cadastrar", async (req, res) => {
   return res.status(201).json({ mensagem: "Usuário cadastrado. Verifique seu e-mail." });
 });
 
-// ===========================
-//  ATIVAR POR CÓDIGO NA URL
-// ===========================
 router.post("/ativar/:codigo", async (req, res) => {
   const { codigo } = req.params;
 
